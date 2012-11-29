@@ -31,7 +31,6 @@ class BizDaily(dBizobj):
 		self.requery_for_dates(date, date)
 
 
-
 class BizStatic(dBizobj):
 	def initProperties(self):
 		self.DataSource = "pmcalendar_static"
@@ -49,8 +48,8 @@ class BizStatic(dBizobj):
 		self.addOrderBy("pmcalendar_static.daymonth")
 
 
-def getMonthView(year, month):
-	"""Get the view of the month in the 35-box format."""
+def getMonthMatrix(year, month):
+	"""Return matrix of dates in the month in the 7x6 format."""
 	matrix = calendar.monthcalendar(year, month)
 	blank_week = [0,0,0,0,0,0,0]
 	last_month = goMonth(datetime.date(year, month, 1), -1)
@@ -78,3 +77,4 @@ def getMonthView(year, month):
 			# current month and year
 			week[day_idx] = datetime.date(year, month, day)
 	return matrix
+

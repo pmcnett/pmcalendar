@@ -2,7 +2,7 @@ import datetime
 import calendar
 import dabo
 dabo.ui.loadUI("wx")
-from dabo.ui import dPanel, dSizer, dGridSizer, dButton, \
+from dabo.ui import dPanel, dSizer, dGridSizer, dButton,
 		dEditBox, dTextBox, dControlMixin, callAfterInterval, dKeys
 from dabo.lib.dates import goMonth
 import biz
@@ -36,6 +36,7 @@ class Day(dButton, BaseMixin):
 
 	def onGotFocus(self, evt):
 		print self.Parent.Date
+
 
 class Static(dTextBox, EditMixin):
 	def initProperties(self):
@@ -144,7 +145,7 @@ class PnlMonth(dPanel):
 				% (current_date.strftime(calendar.month_name.format), self.Year)
 
 	def setDays(self):
-		mv = biz.getMonthView(self.Year, self.Month)
+		mv = biz.getMonthMatrix(self.Year, self.Month)
 		self.date_obj_map = {}
 		for y in range(6):
 			for x in range(7):
