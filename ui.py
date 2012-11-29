@@ -2,7 +2,7 @@ import datetime
 import calendar
 import dabo
 dabo.ui.loadUI("wx")
-from dabo.ui import dPanel, dSizer, dGridSizer, dButton,
+from dabo.ui import dPanel, dSizer, dGridSizer, dButton, \
 		dEditBox, dTextBox, dControlMixin, callAfterInterval, dKeys
 from dabo.lib.dates import goMonth
 import biz
