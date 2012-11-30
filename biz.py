@@ -14,6 +14,12 @@ class BizBase(dBizobj):
 		self.DefaultValues["pk"] = getRandomUUID
 		self.KeyField = "pk"
 
+	def save(self):
+		if not self.Record.diary:
+			self.delete()
+		else:
+			super(BizBase, self).save()
+
 
 class BizDaily(BizBase):
 	def initProperties(self):
