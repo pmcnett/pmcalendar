@@ -14,13 +14,14 @@ class BaseMixin(dControlMixin):
 
 
 class EditMixin(BaseMixin):
-	def onGotFocus(self, evt):
-		# get bizobj on this row
+	def onLostFocus(self, evt):
+		self.save()
+
+	def save(self):
 		pass
 
-	def onLostFocus(self, evt):
-		# save the changes
-		pass
+	def update(self):
+		self.BackColor = "white" if self.Parent.Date.month == self.Parent.Parent.Month else "lightgrey"
 
 
 class Day(dButton, BaseMixin):
@@ -34,8 +35,8 @@ class Day(dButton, BaseMixin):
 	def onKeyDown(self, evt):
 		self.Parent.processDayKeyDown(evt)
 
-	def onGotFocus(self, evt):
-		print self.Parent.Date
+	def onHit(self, evt):
+		self.Parent.diary.setFocus()
 
 
 class Static(dTextBox, EditMixin):
@@ -45,12 +46,34 @@ class Static(dTextBox, EditMixin):
 		self.Name = "static"
 		super(Static, self).initProperties()
 
+	def save(self):
+		cal = self.Parent.Parent
+		day = self.Parent
+		bizStatic = cal.bizStatic
+		monthday = "%s%s" % (day.Date.month, day.Date.day)
+		if not bizStatic.locate(monthday, "monthday"):
+			bizStatic.new()
+			bizStatic.Record.monthday = monthday
+		bizStatic.Record.diary = self.Value
+		bizStatic.save()
+
 
 class Diary(dEditBox, EditMixin):
 	def initProperties(self):
 		self.Height = 10
 		self.Name = "diary"
 		super(Diary, self).initProperties()
+
+	def save(self):
+		cal = self.Parent.Parent
+		day = self.Parent
+		bizDaily = cal.bizDaily
+		date = day.Date
+		if not bizDaily.locate(date, "date"):
+			bizDaily.new()
+			bizDaily.Record.date = date
+		bizDaily.Record.diary = self.Value
+		bizDaily.save()
 
 
 class PnlDay(dPanel):
@@ -127,7 +150,10 @@ class PnlDay(dPanel):
 
 class PnlMonth(dPanel):
 	def afterInit(self):
+		app = self.Application
 		gs = self.Sizer = dGridSizer(MaxCols=7)
+		self.bizStatic = biz.BizStatic(app.db_connection)
+		self.bizDaily = biz.BizDaily(app.db_connection)
 		for y in range(6):
 			for x in range(7):
 				gs.append(PnlDay(self, Pos=(x,y)), "expand")
@@ -146,12 +172,25 @@ class PnlMonth(dPanel):
 
 	def setDays(self):
 		mv = biz.getMonthMatrix(self.Year, self.Month)
+		bizStatic = self.bizStatic
+		bizStatic.requery()
+		bizDaily = self.bizDaily
+		bizDaily.requery_for_dates(mv[0][0], mv[-1][-1])
 		self.date_obj_map = {}
 		for y in range(6):
 			for x in range(7):
 				o = getattr(self, "day_%s_%s" % (x,y))
 				o.Date = mv[y][x]
+				if bizStatic.locate("%s%s" % (o.Date.month, o.Date.day), "monthday"):
+					o.static.Value = bizStatic.Record.diary
+				else:
+					o.static.Value = ""
+				if bizDaily.locate(o.Date, "date"):
+					o.diary.Value = bizDaily.Record.diary
+				else:
+					o.diary.Value = ""
 				self.date_obj_map[o.Date] = o
+		self.update()
 
 	def setFocusToDate(self, date):
 		try:
@@ -181,6 +220,9 @@ class PnlMonth(dPanel):
 		
 if __name__ == "__main__":
 	app = dabo.dApp(MainFormClass=None)
+	dcon = app.db_connection = dabo.db.connect(":memory:")
+	con = dcon._connection
+	con.executescript(open("./create_tables.sql").read())
 	app.setup()
 	frm = dabo.ui.dForm(None)
 	d = PnlMonth(frm)

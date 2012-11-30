@@ -2,25 +2,34 @@ import datetime
 import calendar
 from dabo.biz import dBizobj
 from dabo.lib.dates import goMonth
+from dabo.lib import getRandomUUID
 
 calendar.setfirstweekday(6)  ## set to Sunday for US, leave alone for Europe
 
 
-class BizDaily(dBizobj):
+class BizBase(dBizobj):
 	def initProperties(self):
+		self.AutoPopulatePK = False
+		self.AutoQuoteNames = False
+		self.DefaultValues["pk"] = getRandomUUID
+		self.KeyField = "pk"
+
+
+class BizDaily(BizBase):
+	def initProperties(self):
+		super(BizDaily, self).initProperties()
 		self.DataSource = "pmcalendar_daily"
 		self.DataStructure = (
 				# (field_alias, field_type, pk, table_name, field_name, field_scale)
-				("date_pk", "D", True, "pmcalendar_daily", "date_pk"),
+				("pk", "C", True, "pmcalendar_daily", "pk"),
+				("date", "D", False, "pmcalendar_daily", "date"),
 				("diary", "M", False, "pmcalendar_daily", "diary"),
 				)
-
-		self.KeyField = "date_pk"
 
 	def setBaseSQL(self):
 		self.addFrom(self.DataSource)
 		self.addFieldsFromDataStructure()
-		self.addOrderBy("pmcalendar_daily.date_pk")
+		self.addOrderBy("pmcalendar_daily.date")
 
 	def requery_for_dates(self, beg_date, end_date):
 		self.setWhereClause("date between ? and ?")
@@ -31,21 +40,22 @@ class BizDaily(dBizobj):
 		self.requery_for_dates(date, date)
 
 
-class BizStatic(dBizobj):
+class BizStatic(BizBase):
 	def initProperties(self):
+		super(BizStatic, self).initProperties()
 		self.DataSource = "pmcalendar_static"
 		self.DataStructure = (
 				# (field_alias, field_type, pk, table_name, field_name, field_scale)
-				("daymonth", "C", True, "pmcalendar_static", "daymonth"),
+				("pk", "C", True, "pmcalendar_static", "pk"),
+				("monthday", "C", True, "pmcalendar_static", "monthday"),
 				("diary", "M", False, "pmcalendar_static", "diary"),
 				)
 
-		self.KeyField = "daymonth"
 
 	def setBaseSQL(self):
 		self.addFrom(self.DataSource)
 		self.addFieldsFromDataStructure()
-		self.addOrderBy("pmcalendar_static.daymonth")
+		self.addOrderBy("pmcalendar_static.monthday")
 
 
 def getMonthMatrix(year, month):

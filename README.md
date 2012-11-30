@@ -24,3 +24,12 @@ Requirements
 * Reportlab 2.1 or higher (if running PDF reports)
 * PIL (if running PDF reports)
 
+
+See it in action
+----------------
+
+After installing and confirming the above prerequisites were installed:
+
+    cd pmcalendar
+    python ui.py
+
