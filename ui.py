@@ -2,7 +2,7 @@ import datetime
 import calendar
 import dabo
 dabo.ui.loadUI("wx")
-from dabo.ui import dPanel, dSizer, dGridSizer, dButton, \
+from dabo.ui import dForm, dPanel, dSizer, dGridSizer, dButton, \
 		dEditBox, dTextBox, dControlMixin, callAfterInterval, dKeys
 from dabo.lib.dates import goMonth
 import biz
@@ -14,6 +14,11 @@ class BaseMixin(dControlMixin):
 
 
 class EditMixin(BaseMixin):
+	def initProperties(self):
+		super(EditMixin, self).initProperties()
+		self.Height = 5
+		self.Width = 5
+
 	def onLostFocus(self, evt):
 		self.save()
 
@@ -21,7 +26,9 @@ class EditMixin(BaseMixin):
 		pass
 
 	def update(self):
-		self.BackColor = "white" if self.Parent.Date.month == self.Parent.Parent.Month else "lightgrey"
+		self.BackColor = "white" \
+				if self.Parent.Date.month == self.Parent.Parent.Month \
+				else "lightgrey"
 
 
 class Day(dButton, BaseMixin):
@@ -60,7 +67,6 @@ class Static(dTextBox, EditMixin):
 
 class Diary(dEditBox, EditMixin):
 	def initProperties(self):
-		self.Height = 10
 		self.Name = "diary"
 		super(Diary, self).initProperties()
 
@@ -92,17 +98,18 @@ class PnlDay(dPanel):
 		evtData = evt.EventData
 		kc = evtData["keyCode"]
 		ctrlDown = evtData["controlDown"]
+		layout = self.Form.CalendarLayout
 		if kc not in [dKeys.key_Up, dKeys.key_Down, dKeys.key_Left, dKeys.key_Right]:
 			return
 		evt.stop()
 		if not ctrlDown:
 			# move by day, wrapping around in the calendar
 			x,y = self.Pos
-			if kc == dKeys.key_Up:
+			if kc == dKeys.key_Up and layout in ("month",):
 				y -= 1
 				if y < 0:
 					y = 5
-			elif kc == dKeys.key_Down:
+			elif kc == dKeys.key_Down and layout in ("month",):
 				y += 1
 				if y > 5:
 					y = 0
@@ -148,13 +155,15 @@ class PnlDay(dPanel):
 	Date = property(_getDate, _setDate)
 
 
-class PnlMonth(dPanel):
+class PnlLayout(dPanel):
+	_week_range = None
+
 	def afterInit(self):
-		app = self.Application
+		con = self.Form.Connection
 		gs = self.Sizer = dGridSizer(MaxCols=7)
-		self.bizStatic = biz.BizStatic(app.db_connection)
-		self.bizDaily = biz.BizDaily(app.db_connection)
-		for y in range(6):
+		self.bizStatic = biz.BizStatic(con)
+		self.bizDaily = biz.BizDaily(con)
+		for y in range(self._week_range):
 			for x in range(7):
 				gs.append(PnlDay(self, Pos=(x,y)), "expand")
 		gs.setFullExpand()
@@ -167,8 +176,8 @@ class PnlMonth(dPanel):
 
 	def setFormCaption(self):
 		current_date = datetime.date(self.Year, self.Month, 1)
-		self.Form.Caption = "%s %s" \
-				% (current_date.strftime(calendar.month_name.format), self.Year)
+		self.Form.setCaption("%s %s" \
+				% (current_date.strftime(calendar.month_name.format), self.Year))
 
 	def setDays(self):
 		mv = biz.getMonthMatrix(self.Year, self.Month)
@@ -177,7 +186,7 @@ class PnlMonth(dPanel):
 		bizDaily = self.bizDaily
 		bizDaily.requery_for_dates(mv[0][0], mv[-1][-1])
 		self.date_obj_map = {}
-		for y in range(6):
+		for y in range(self._week_range):
 			for x in range(7):
 				o = getattr(self, "day_%s_%s" % (x,y))
 				o.Date = mv[y][x]
@@ -217,16 +226,65 @@ class PnlMonth(dPanel):
 	Month = property(_getMonth, _setMonth)
 	Year = property(_getYear, _setYear)
 
-		
+
+class PnlMonth(PnlLayout):
+	_week_range = 6
+
+
+class PnlWeek(PnlLayout):
+	_week_range = 1
+
+
+class FrmCalendar(dForm):
+	def afterInit(self):
+		self._appendCaption = ""
+		dcon = self.Connection
+		if dcon is None:
+			# use in-memory test sqlite database
+			dcon = self.Connection = dabo.db.connect(":memory:")
+			con = dcon._connection
+			con.executescript(open("./create_tables.sql").read())
+			self._appendCaption = "Temporary Database"
+		self._instantiatedLayouts = {}
+		self.Sizer = dSizer("v")
+		self.updateLayout()
+			
+	def updateLayout(self):
+		"""Draw the calendar on screen depending on self.Layout."""
+		pnls = self._instantiatedLayouts
+		PnlClass = {"month": PnlMonth, "week": PnlWeek}[self.CalendarLayout]
+		vs = self.Sizer
+		for pnl in pnls.values():
+			pnl.Visible = False
+		pnl = pnls.setdefault(PnlClass, PnlClass(self))
+		if pnl not in vs.ChildWindows:
+			vs.append1x(pnl)
+		self.layout()
+
+	def setCaption(self, val):
+		self.Caption = "%s [%s]" % (val, self._appendCaption)
+
+	def _getConnection(self):
+		return getattr(self, "_connection", None)
+
+	def _setConnection(self, val):
+		self._connection = val
+
+	def _getCalendarLayout(self):
+		return getattr(self, "_calendar_layout", "month")
+
+	def _setCalendarLayout(self, val):
+		self._calendar_layout = val
+		assert val in ("month", "week")
+		dabo.ui.callAfterInterval(10, self.updateLayout())
+
+	
+	CalendarLayout = property(_getCalendarLayout, _setCalendarLayout, None,
+			"""Either "month" or "week".""")
+
+	Connection = property(_getConnection, _setConnection, None,
+			"Dabo dConnection instance.")
+
+
 if __name__ == "__main__":
-	app = dabo.dApp(MainFormClass=None)
-	dcon = app.db_connection = dabo.db.connect(":memory:")
-	con = dcon._connection
-	con.executescript(open("./create_tables.sql").read())
-	app.setup()
-	frm = dabo.ui.dForm(None)
-	d = PnlMonth(frm)
-	frm.Sizer = dSizer("v")
-	frm.Sizer.append1x(d)
-	frm.show()
-	app.start()
+	dabo.dApp(MainFormClass=FrmCalendar).start()
