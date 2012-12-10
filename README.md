@@ -33,3 +33,21 @@ After installing and confirming the above prerequisites were installed:
     cd pmcalendar
     python ui.py
 
+This will run it with an in-memory database automatically created for you.
+
+
+Use it in your application
+--------------------------
+
+Put it in your PYTHONPATH. I have the pmcalendar package under /home/pmcnett/pmcalendar and so I add a .pth file to my /usr/local/lib/python2.6/dist-packages directory that says "/home/pmcnett/pmcalendar".
+
+Then use the create_tables.sql to add the required tables to your database, and add code to your application like:
+
+`
+from pmcalendar.ui import FrmCalendar
+app = self.Application  ## (in a Dabo app where self is any dObject)
+con = app.dbConnection  ## (whatever dConnection your app uses)
+frmCalendar = FrmCalendar(self, Connection=con)
+frmCalendar.show()
+`
+
