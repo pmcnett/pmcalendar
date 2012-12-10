@@ -8,7 +8,7 @@ Features
 --------
 
 * Desktop GUI calendar with month, week, and day views (week and day: TODO).
-* Corresponding PDF reports with month, week, and day views (week and day: TODO).
+* Corresponding PDF reports with month, week, and day views (TODO).
 * Very simple to use.
 * User can enter static and diary entries for each day.
 * Multiple database backends supported (MySQL, SQLite, PostgreSQL) (Not tested on PostgreSQL yet; other backends should work, too)
