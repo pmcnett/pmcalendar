@@ -264,7 +264,10 @@ class FrmCalendar(dForm):
 		self.layout()
 
 	def setCaption(self, val):
-		self.Caption = "%s [%s]" % (val, self._appendCaption)
+		appendCaption = self._appendCaption
+		if appendCaption:
+			appendCaption = "[%s]" % appendCaption
+		self.Caption = "%s %s" % (val, appendCaption)
 
 	def _getConnection(self):
 		return getattr(self, "_connection", None)
