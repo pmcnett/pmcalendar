@@ -7,12 +7,12 @@ Desktop calendar applet that supports multiple database backends.
 Features
 --------
 
-* Desktop GUI calendar with month, week, and day views.
-* Corresponding PDF reports with month, week, and day views.
+* Desktop GUI calendar with month, week, and day views (week and day: TODO).
+* Corresponding PDF reports with month, week, and day views (week and day: TODO).
 * Very simple to use.
 * User can enter static and diary entries for each day.
-* Multiple database backends supported (MySQL, SQLite, PostgreSQL)
-* Stand-alone application or library to be imported and used in your application.
+* Multiple database backends supported (MySQL, SQLite, PostgreSQL) (Not tested on PostgreSQL yet; other backends should work, too)
+* Can be used as a stand-alone application, or as a library to be imported and used in your larger application.
 
 
 Requirements
