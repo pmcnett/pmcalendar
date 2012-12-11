@@ -53,7 +53,7 @@ class EditMixin(BaseMixin):
 					if self.Parent.Date.month == self.Parent.Parent.Month \
 					else "lightgrey"
 		except StandardError:
-			return "white"
+			return "darkgrey"
 
 
 class Day(dLabel):
@@ -222,7 +222,7 @@ class PnlDay(dPanel):
 					if self.Date.month == self.Parent.Month \
 					else "lightgrey"
 		except StandardError:
-			return "white"
+			return "darkgrey"
 
 	def _getPos(self):
 		return self._pos
