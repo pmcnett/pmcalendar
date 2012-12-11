@@ -15,6 +15,21 @@ class BaseMixin(dControlMixin):
 	def initProperties(self):
 		self.BorderStyle = None
 
+	def onGotFocus(self, evt):
+		callAfterInterval(10, self.Parent.gotFocus)
+
+	def onLostFocus(self, evt):
+		callAfterInterval(10, self.Parent.lostFocus)
+
+
+class DummyTextBox(dTextBox, BaseMixin):
+	"""Invisible textbox simply to receive and respond to user actions."""
+	def initProperties(self):
+		self.Size = (0, 0)
+
+	def onKeyDown(self, evt):
+		self.Parent.processDayKeyDown(evt)
+
 
 class EditMixin(BaseMixin):
 	def initProperties(self):
@@ -23,6 +38,7 @@ class EditMixin(BaseMixin):
 		self.Width = 5
 
 	def onLostFocus(self, evt):
+		super(EditMixin, self).onLostFocus(evt)
 		self.save()
 
 	def save(self):
@@ -34,24 +50,21 @@ class EditMixin(BaseMixin):
 				else "lightgrey"
 
 
-class Day(dButton, BaseMixin):
+class Day(dLabel):
 	def initProperties(self):
 		self.Width = 30
 		self.Height = 23
 		self.Name = "day"
-		self.ReadOnly = True
-		super(Day, self).initProperties()
 
-	def onKeyDown(self, evt):
-		self.Parent.processDayKeyDown(evt)
+	def onMouseLeftClick(self, evt):
+		self.Parent.setFocus()
 
-	def onHit(self, evt):
+	def onMouseLeftDoubleClick(self, evt):
 		self.Parent.diary.setFocus()
 
 
 class Static(dTextBox, EditMixin):
 	def initProperties(self):
-		self.Value = "blah..."
 		self.FontItalic = True
 		self.Name = "static"
 		super(Static, self).initProperties()
@@ -88,8 +101,10 @@ class Diary(dEditBox, EditMixin):
 class PnlDay(dPanel):
 	def initProperties(self):
 		self.BorderStyle = "Raised"
+		self._hadFocus = False
 
 	def afterInit(self):
+		self.dummy = DummyTextBox(self)
 		vs = self.Sizer = dSizer("v")
 		hs = dSizer("h")
 		hs.append(Day(self), "expand")
@@ -97,11 +112,36 @@ class PnlDay(dPanel):
 		vs.append(hs, "expand")
 		vs.append1x(Diary(self))
 
+	def gotFocus(self):
+		day = self.day
+		dummy = self.dummy
+		if not self._hadFocus:
+			day.FontBold = True
+			day.FontSize = 12
+		self._hadFocus = True
+		day.FontItalic = (self.Form.ActiveControl == dummy)
+		day.refresh()
+
+	def lostFocus(self):
+		if self.Form.ActiveControl not in self.Children:
+			self._hadFocus = False
+			day = self.day
+			day.FontBold = False
+			day.FontSize = 10
+			self.refresh()
+
+	def setFocus(self):
+		self.dummy.setFocus()
+
 	def processDayKeyDown(self, evt):
 		evtData = evt.EventData
 		kc = evtData["keyCode"]
 		ctrlDown = evtData["controlDown"]
 		layout = self.Form.CalendarLayout
+		if kc in [dKeys.key_Enter, dKeys.key_Numpad_enter]:
+			self.diary.setFocus()
+			evt.stop()
+			return
 		if kc not in [dKeys.key_Up, dKeys.key_Down, dKeys.key_Left, dKeys.key_Right]:
 			return
 		evt.stop()
@@ -125,7 +165,7 @@ class PnlDay(dPanel):
 				if x > 6:
 					x = 0
 			new_ctrl = getattr(self.Parent, "day_%s_%s" % (x,y))
-			new_ctrl.day.setFocus()
+			new_ctrl.setFocus()
 		else:
 			year, month = self.Parent.Year, self.Parent.Month
 			current_date = datetime.date(year, month, 1)
@@ -210,7 +250,7 @@ class PnlLayout(dPanel):
 
 	def setFocusToDate(self, date):
 		try:
-			self.date_obj_map[date].day.setFocus()
+			self.date_obj_map[date].setFocus()
 		except (KeyError, AttributeError):
 			self.Year = date.year
 			self.Month = date.month
