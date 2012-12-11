@@ -47,6 +47,7 @@ class EditMixin(BaseMixin):
 		pass
 
 	def update(self):
+		super(EditMixin, self).update()
 		self.BackColor = "white" \
 				if self.Parent.Date.month == self.Parent.Parent.Month \
 				else "lightgrey"
@@ -57,6 +58,7 @@ class Day(dLabel):
 		self.Width = 30
 		self.Height = 23
 		self.Name = "day"
+		self.ForeColor = "blue"
 
 	def onMouseLeftClick(self, evt):
 		self.Parent.setFocus()
@@ -210,6 +212,11 @@ class PnlDay(dPanel):
 			self.Parent.Year = new_date.year
 			self.Parent.Month = new_date.month
 
+	def update(self):
+		self.BackColor = "white" \
+				if self.Date.month == self.Parent.Month \
+				else "lightgrey"
+		super(PnlDay, self).update()
 
 	def _getPos(self):
 		return self._pos
