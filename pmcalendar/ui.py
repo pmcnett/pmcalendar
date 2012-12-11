@@ -153,7 +153,7 @@ class PnlDay(dPanel):
 		dummy = self.dummy
 		if not self._hadFocus:
 			day.FontBold = True
-			day.FontSize = 12
+			day.ForeColor = "darkblue"
 		self._hadFocus = True
 		day.FontItalic = (self.Form.ActiveControl == dummy)
 		day.refresh()
@@ -163,7 +163,7 @@ class PnlDay(dPanel):
 			self._hadFocus = False
 			day = self.day
 			day.FontBold = False
-			day.FontSize = 10
+			day.ForeColor = "blue"
 			self.refresh()
 
 	def setFocus(self):
