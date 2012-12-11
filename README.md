@@ -28,9 +28,9 @@ Requirements
 
 Screenshots
 -----------
-* ![Mac Screenshot](screenshots/screenshot_mac.png "Mac")
-* ![Windows Screenshot](screenshots/screenshot_windows.png "Windows")
-* ![Linux Screenshot](screenshots/screenshot_linux.png "Linux")
+* ![Mac](https://raw.github.com/pmcnett/pmcalendar/master/screenshots/screenshot_mac.png)
+* ![Windows](https://raw.github.com/pmcnett/pmcalendar/master/screenshots/screenshot_windows.png)
+* ![Linux](https://raw.github.com/pmcnett/pmcalendar/master/screenshots/screenshot_linux.png)
 
 
 See it in action
