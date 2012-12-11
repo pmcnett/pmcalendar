@@ -25,7 +25,9 @@ class BaseMixin(dControlMixin):
 class DummyTextBox(dTextBox, BaseMixin):
 	"""Invisible textbox simply to receive and respond to user actions."""
 	def initProperties(self):
+		import wx
 		self.Size = (0, 0)
+		self._addWindowStyleFlag(wx.TE_PROCESS_ENTER)
 
 	def onKeyDown(self, evt):
 		self.Parent.processDayKeyDown(evt)
@@ -81,10 +83,29 @@ class Static(dTextBox, EditMixin):
 		bizStatic.save()
 
 
-class Diary(dEditBox, EditMixin):
+class DiaryView(dEditBox, EditMixin):
 	def initProperties(self):
+		import wx
 		self.Name = "diary"
-		super(Diary, self).initProperties()
+		self._addWindowStyleFlag(wx.TE_NO_VSCROLL)
+		super(DiaryView, self).initProperties()
+
+	def onGotFocus(self, evt):
+		edit = self.Parent.diaryedit
+		edit.Visible = True
+		self.Visible = False
+		self.Parent.layout()
+		edit.setFocus()
+
+	def onLostFocus(self, evt):
+		pass
+
+
+class DiaryEdit(dEditBox, EditMixin):
+	def initProperties(self):
+		self.Name = "diaryedit"
+		self.Visible = False
+		super(DiaryEdit, self).initProperties()
 
 	def save(self):
 		cal = self.Parent.Parent
@@ -96,6 +117,14 @@ class Diary(dEditBox, EditMixin):
 			bizDaily.Record.date = date
 		bizDaily.Record.diary = self.Value
 		bizDaily.save()
+
+	def onLostFocus(self, evt):
+		super(DiaryEdit, self).onLostFocus(evt)
+		view = self.Parent.diary
+		view.Value = self.Value
+		view.Visible = True
+		self.Visible = False
+		self.Parent.layout()
 
 
 class PnlDay(dPanel):
@@ -110,7 +139,8 @@ class PnlDay(dPanel):
 		hs.append(Day(self), "expand")
 		hs.append1x(Static(self))
 		vs.append(hs, "expand")
-		vs.append1x(Diary(self))
+		vs.append1x(DiaryView(self))
+		vs.append1x(DiaryEdit(self))
 
 	def gotFocus(self):
 		day = self.day
@@ -179,6 +209,7 @@ class PnlDay(dPanel):
 				new_date = goMonth(current_date, 12)
 			self.Parent.Year = new_date.year
 			self.Parent.Month = new_date.month
+
 
 	def _getPos(self):
 		return self._pos
