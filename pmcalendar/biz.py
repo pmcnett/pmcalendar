@@ -6,8 +6,6 @@ from dabo.biz import dBizobj
 from dabo.lib.dates import goMonth
 from dabo.lib import getRandomUUID
 
-calendar.setfirstweekday(6)  ## set to Sunday for US, leave alone for Europe
-
 
 class BizBase(dBizobj):
 	def initProperties(self):

@@ -5,7 +5,8 @@ import calendar
 import dabo
 dabo.ui.loadUI("wx")
 from dabo.ui import dForm, dPanel, dSizer, dGridSizer, dButton, \
-		dEditBox, dTextBox, dControlMixin, callAfterInterval, dKeys
+		dEditBox, dTextBox, dControlMixin, callAfterInterval, dKeys, \
+		dLabel
 from dabo.lib.dates import goMonth
 import biz
 
@@ -165,10 +166,14 @@ class PnlLayout(dPanel):
 		gs = self.Sizer = dGridSizer(MaxCols=7)
 		self.bizStatic = biz.BizStatic(con)
 		self.bizDaily = biz.BizDaily(con)
+		header = calendar.weekheader(3).split()
+		for x in header:
+			gs.append(dLabel(self, Caption=x), alignment="center")
 		for y in range(self._week_range):
 			for x in range(7):
 				gs.append(PnlDay(self, Pos=(x,y)), "expand")
-		gs.setFullExpand()
+				gs.setColExpand(True, x)
+			gs.setRowExpand(True, y+1)
 		today = datetime.date.today()
 		self.setFocusToDate(today)
 
@@ -292,4 +297,9 @@ class FrmCalendar(dForm):
 
 
 if __name__ == "__main__":
+	# If you want Sunday to be the first weekday, you need code like
+	# the following commented lines in your application prior to 
+	# importing pmcalendar:
+	#import calendar
+	#calendar.setfirstweekday(6)
 	dabo.dApp(MainFormClass=FrmCalendar).start()
