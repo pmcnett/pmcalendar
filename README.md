@@ -1,12 +1,13 @@
 pmcalendar
 ==========
 
-Desktop calendar applet that supports multiple database backends.
+Cross-platform desktop calendar applet that supports multiple database backends.
 
 
 Features
 --------
 
+* Runs on Linux, Mac, and Windows
 * Desktop GUI calendar with month, week, and day views (week and day: TODO).
 * Corresponding PDF reports with month, week, and day views (TODO).
 * Very simple to use.
@@ -23,6 +24,13 @@ Requirements
 * Dabo 0.9.4 or higher
 * Reportlab 2.1 or higher (if running PDF reports)
 * PIL (if running PDF reports)
+
+
+Screenshots
+-----------
+* ![Mac Screenshot](screenshots/screenshot_mac.png "Mac")
+* ![Windows Screenshot](screenshots/screenshot_windows.png "Windows")
+* ![Linux Screenshot](screenshots/screenshot_linux.png "Linux")
 
 
 See it in action
