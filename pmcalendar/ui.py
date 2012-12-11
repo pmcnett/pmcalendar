@@ -38,6 +38,7 @@ class EditMixin(BaseMixin):
 		super(EditMixin, self).initProperties()
 		self.Height = 5
 		self.Width = 5
+		self.DynamicBackColor = self.getBackColor
 
 	def onLostFocus(self, evt):
 		super(EditMixin, self).onLostFocus(evt)
@@ -46,11 +47,13 @@ class EditMixin(BaseMixin):
 	def save(self):
 		pass
 
-	def update(self):
-		super(EditMixin, self).update()
-		self.BackColor = "white" \
-				if self.Parent.Date.month == self.Parent.Parent.Month \
-				else "lightgrey"
+	def getBackColor(self):
+		try:
+			return "white" \
+					if self.Parent.Date.month == self.Parent.Parent.Month \
+					else "lightgrey"
+		except StandardError:
+			return "white"
 
 
 class Day(dLabel):
@@ -132,6 +135,7 @@ class DiaryEdit(dEditBox, EditMixin):
 class PnlDay(dPanel):
 	def initProperties(self):
 		self.BorderStyle = "Raised"
+		self.DynamicBackColor = self.getBackColor
 		self._hadFocus = False
 
 	def afterInit(self):
@@ -212,11 +216,13 @@ class PnlDay(dPanel):
 			self.Parent.Year = new_date.year
 			self.Parent.Month = new_date.month
 
-	def update(self):
-		self.BackColor = "white" \
-				if self.Date.month == self.Parent.Month \
-				else "lightgrey"
-		super(PnlDay, self).update()
+	def getBackColor(self):
+		try:
+			return  "white" \
+					if self.Date.month == self.Parent.Month \
+					else "lightgrey"
+		except StandardError:
+			return "white"
 
 	def _getPos(self):
 		return self._pos
