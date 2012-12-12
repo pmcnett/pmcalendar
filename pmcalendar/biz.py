@@ -1,10 +1,10 @@
-__all__ = ["BizStatic", "BizDaily"]
-
 import datetime
 import calendar
 from dabo.biz import dBizobj
 from dabo.lib.dates import goMonth
 from dabo.lib import getRandomUUID
+
+__all__ = ["BizStatic", "BizDaily"]
 
 
 class BizBase(dBizobj):
@@ -28,7 +28,7 @@ class BizDaily(BizBase):
         super(BizDaily, self).initProperties()
         self.DataSource = "pmcalendar_daily"
         self.DataStructure = (
-                # (field_alias, field_type, pk, table_name, field_name, field_scale)
+                # (alias, type, pk, table, field, scale)
                 ("pk", "C", True, "pmcalendar_daily", "pk"),
                 ("date", "D", False, "pmcalendar_daily", "date"),
                 ("diary", "M", False, "pmcalendar_daily", "diary"),
@@ -54,7 +54,6 @@ class BizStatic(BizBase):
         super(BizStatic, self).initProperties()
         self.DataSource = "pmcalendar_static"
         self.DataStructure = (
-                # (field_alias, field_type, pk, table_name, field_name, field_scale)
                 ("pk", "C", True, "pmcalendar_static", "pk"),
                 ("monthday", "C", True, "pmcalendar_static", "monthday"),
                 ("diary", "M", False, "pmcalendar_static", "diary"),
@@ -78,7 +77,8 @@ def getMonthMatrix(year, month):
     first_week = matrix[0]
     for idx in range(6, -1, -1):
         if first_week[idx] == 0:
-            first_week[idx] = datetime.date(last_month.year, last_month.month, last_month_day)
+            first_week[idx] = datetime.date(last_month.year, last_month.month,
+                                            last_month_day)
             last_month_day -= 1
     for week_idx in range(0, 6):
         try:
@@ -90,7 +90,8 @@ def getMonthMatrix(year, month):
             if isinstance(day, datetime.date):
                 continue
             if day == 0:
-                week[day_idx] = datetime.date(next_month.year, next_month.month, next_month_day)
+                week[day_idx] = datetime.date(next_month.year,
+                                              next_month.month, next_month_day)
                 next_month_day += 1
                 continue
             # current month and year

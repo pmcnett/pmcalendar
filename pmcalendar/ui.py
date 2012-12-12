@@ -1,14 +1,14 @@
-__all__ = ["FrmCalendar"]
-
 import datetime
 import calendar
 import dabo
 dabo.ui.loadUI("wx")
-from dabo.ui import dForm, dPanel, dSizer, dGridSizer, dButton, \
-        dEditBox, dTextBox, dControlMixin, callAfterInterval, dKeys, \
-        dLabel
+from dabo.ui import dForm, dPanel, dSizer, dGridSizer, dButton, dEditBox, \
+                    dTextBox, dControlMixin, callAfterInterval, dKeys, \
+                    dLabel
 from dabo.lib.dates import goMonth
 import biz
+
+__all__ = ["FrmCalendar"]
 
 
 class BaseMixin(dControlMixin):
@@ -26,7 +26,7 @@ class BaseMixin(dControlMixin):
 class DummyTextBox(dTextBox, BaseMixin):
     """Invisible textbox simply to receive and respond to user actions."""
     def initProperties(self):
-        ## dabo doesn't yet offer a public interface to setting wx.TE_PROCESS_ENTER.
+        ## Dabo doesn't yet offer an interface to set wx.TE_PROCESS_ENTER.
         import wx
         self.Size = (0, 0)
         self._addWindowStyleFlag(wx.TE_PROCESS_ENTER)
@@ -52,11 +52,11 @@ class EditMixin(BaseMixin):
         pass
 
     def getBackColor(self):
-        """Coloring depends on whether this day is in the current month or not."""
+        """Color depends on whether this day is in the current month."""
         try:
-            return "white" \
-                    if self.Parent.Date.month == self.Parent.Parent.Month \
-                    else "lightgrey"
+            return (
+                "white" if self.Parent.Date.month == self.Parent.Parent.Month
+                else "lightgrey")
         except StandardError:
             return "darkgrey"
 
@@ -194,7 +194,8 @@ class PnlDay(dPanel):
             self.diary.setFocus()
             evt.stop()
             return
-        if kc not in [dKeys.key_Up, dKeys.key_Down, dKeys.key_Left, dKeys.key_Right]:
+        if kc not in [dKeys.key_Up, dKeys.key_Down,
+                      dKeys.key_Left, dKeys.key_Right]:
             return
         evt.stop()
         if not ctrlDown:
@@ -234,9 +235,8 @@ class PnlDay(dPanel):
 
     def getBackColor(self):
         try:
-            return  "white" \
-                    if self.Date.month == self.Parent.Month \
-                    else "lightgrey"
+            return  ("white" if self.Date.month == self.Parent.Month
+                     else "lightgrey")
         except StandardError:
             return "darkgrey"
 
@@ -259,7 +259,7 @@ class PnlDay(dPanel):
 
 
 class PnlLayout(dPanel):
-    """Superclass to handle common elements for all views (day, month, week...)"""
+    """Superclass to handle common elements for views (day, month, week)."""
     _week_range = None
 
     def afterInit(self):
@@ -284,8 +284,8 @@ class PnlLayout(dPanel):
 
     def setFormCaption(self):
         current_date = datetime.date(self.Year, self.Month, 1)
-        self.Form.setCaption("%s %s" \
-                % (current_date.strftime(calendar.month_name.format), self.Year))
+        self.Form.setCaption("%s %s" % (
+                current_date.strftime(calendar.month_name.format), self.Year))
 
     def setDays(self):
         mv = biz.getMonthMatrix(self.Year, self.Month)
@@ -298,7 +298,8 @@ class PnlLayout(dPanel):
             for x in range(7):
                 o = getattr(self, "day_%s_%s" % (x,y))
                 o.Date = mv[y][x]
-                if bizStatic.locate("%s%s" % (o.Date.month, o.Date.day), "monthday"):
+                if bizStatic.locate("%s%s" % (
+                        o.Date.month, o.Date.day), "monthday"):
                     o.static.Value = bizStatic.Record.diary
                 else:
                     o.static.Value = ""
