@@ -12,6 +12,7 @@ import biz
 
 
 class BaseMixin(dControlMixin):
+	"""Base behavior for all the relevant controls."""
 	def initProperties(self):
 		self.BorderStyle = None
 
@@ -25,6 +26,7 @@ class BaseMixin(dControlMixin):
 class DummyTextBox(dTextBox, BaseMixin):
 	"""Invisible textbox simply to receive and respond to user actions."""
 	def initProperties(self):
+		## dabo doesn't yet offer a public interface to setting wx.TE_PROCESS_ENTER.
 		import wx
 		self.Size = (0, 0)
 		self._addWindowStyleFlag(wx.TE_PROCESS_ENTER)
@@ -34,6 +36,7 @@ class DummyTextBox(dTextBox, BaseMixin):
 
 
 class EditMixin(BaseMixin):
+	"""Base behavior for the edit boxes."""
 	def initProperties(self):
 		super(EditMixin, self).initProperties()
 		self.Height = 5
@@ -45,9 +48,11 @@ class EditMixin(BaseMixin):
 		self.save()
 
 	def save(self):
+		"""Subclasses must override if they want entered data to be saved."""
 		pass
 
 	def getBackColor(self):
+		"""Coloring depends on whether this day is in the current month or not."""
 		try:
 			return "white" \
 					if self.Parent.Date.month == self.Parent.Parent.Month \
@@ -57,6 +62,7 @@ class EditMixin(BaseMixin):
 
 
 class Day(dLabel):
+	"""The day number in the upper-left of each day panel."""
 	def initProperties(self):
 		self.Width = 30
 		self.Height = 23
@@ -71,6 +77,7 @@ class Day(dLabel):
 
 
 class Static(dTextBox, EditMixin):
+	"""View/edit/save the diary entries that repeat on this day every year."""
 	def initProperties(self):
 		self.FontItalic = True
 		self.Name = "static"
@@ -89,13 +96,16 @@ class Static(dTextBox, EditMixin):
 
 
 class DiaryView(dEditBox, EditMixin):
+	"""The view of the day's diary (no unneeded scrollbars)."""
 	def initProperties(self):
+		## dabo doesn't yet allow overriding the display of scrollbars.
 		import wx
 		self.Name = "diary"
 		self._addWindowStyleFlag(wx.TE_NO_VSCROLL)
 		super(DiaryView, self).initProperties()
 
 	def onGotFocus(self, evt):
+		"""Switch to the edit control (with scrollbars)."""
 		edit = self.Parent.diaryedit
 		edit.Visible = True
 		self.Visible = False
@@ -103,10 +113,12 @@ class DiaryView(dEditBox, EditMixin):
 		edit.setFocus()
 
 	def onLostFocus(self, evt):
+		## overridden to avoid unneccesary save()
 		pass
 
 
 class DiaryEdit(dEditBox, EditMixin):
+	"""The editable view of the day's diary (with scrollbars)."""
 	def initProperties(self):
 		self.Name = "diaryedit"
 		self.Visible = False
@@ -133,6 +145,7 @@ class DiaryEdit(dEditBox, EditMixin):
 
 
 class PnlDay(dPanel):
+	"""Panel of a calendar day, including the day number and edit controls."""
 	def initProperties(self):
 		self.BorderStyle = "Raised"
 		self.DynamicBackColor = self.getBackColor
@@ -170,6 +183,7 @@ class PnlDay(dPanel):
 		self.dummy.setFocus()
 
 	def processDayKeyDown(self, evt):
+		"""User is navigating the calendar; respond appropriately."""
 		evtData = evt.EventData
 		kc = evtData["keyCode"]
 		ctrlDown = evtData["controlDown"]
@@ -243,6 +257,7 @@ class PnlDay(dPanel):
 
 
 class PnlLayout(dPanel):
+	"""Superclass to handle common elements for all views (day, month, week...)"""
 	_week_range = None
 
 	def afterInit(self):
@@ -319,14 +334,17 @@ class PnlLayout(dPanel):
 
 
 class PnlMonth(PnlLayout):
+	"""Standard 7x6 month layout."""
 	_week_range = 6
 
 
 class PnlWeek(PnlLayout):
+	"""7x1 week layout (INCOMPLETE)."""
 	_week_range = 1
 
 
 class FrmCalendar(dForm):
+	"""The main containing form of the calendar."""
 	def afterInit(self):
 		self._appendCaption = ""
 		dcon = self.Connection
@@ -387,3 +405,4 @@ if __name__ == "__main__":
 	#import calendar
 	#calendar.setfirstweekday(6)
 	dabo.dApp(MainFormClass=FrmCalendar).start()
+

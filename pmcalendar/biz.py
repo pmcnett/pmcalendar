@@ -8,6 +8,7 @@ from dabo.lib import getRandomUUID
 
 
 class BizBase(dBizobj):
+	"""Superclass with common behaviors and properties."""
 	def initProperties(self):
 		self.AutoPopulatePK = False
 		self.AutoQuoteNames = False
@@ -22,6 +23,7 @@ class BizBase(dBizobj):
 
 
 class BizDaily(BizBase):
+	"""The diary entries for each day."""
 	def initProperties(self):
 		super(BizDaily, self).initProperties()
 		self.DataSource = "pmcalendar_daily"
@@ -47,6 +49,7 @@ class BizDaily(BizBase):
 
 
 class BizStatic(BizBase):
+	"""The diary entries that repeat for this day every year."""
 	def initProperties(self):
 		super(BizStatic, self).initProperties()
 		self.DataSource = "pmcalendar_static"
