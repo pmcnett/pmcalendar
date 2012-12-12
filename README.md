@@ -7,12 +7,12 @@ Cross-platform desktop calendar applet that supports multiple database backends.
 Features
 --------
 
-* Runs on Linux, Mac, and Windows
-* Desktop GUI calendar with month, week, and day views (week and day: TODO).
-* Corresponding PDF reports with month, week, and day views (TODO).
-* Very simple to use.
+* Very simple to use, like making hand annotations on a paper calendar.
+* Runs on Linux, Mac, and Windows.
+* Desktop monthly GUI calendar, navigable by mouse or keyboard.
+* PDF Report output. (TODO)
 * User can enter static and diary entries for each day.
-* Multiple database backends supported (MySQL, SQLite, PostgreSQL) (Not tested on PostgreSQL yet; other backends should work, too)
+* Multiple database backends supported (MySQL, SQLite, PostgreSQL) (Not tested on PostgreSQL yet; other Dabo-supported backends should work, too)
 * Can be used as a stand-alone application, or as a library to be imported and used in your larger application.
 
 
