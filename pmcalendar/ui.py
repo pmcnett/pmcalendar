@@ -165,7 +165,7 @@ class PnlDay(dPanel):
         parent = self.Parent
         diary = self.diary
         self.key_actions = {
-            (dKeys.key_Enter, dKeys.key_Numpad_enter): (diary.setFocus,),
+            (dKeys.key_Enter, dKeys.key_Numpad_enter): (diary.setFocus, ()),
             (ord("t"), ord("T")): (parent.setFocusToToday, ()),
             (ord("+"), ord("=")): (self.setFocusToInterval, ("days", 1)),
             (ord("-"),): (self.setFocusToInterval, ("days", -1)),
@@ -179,7 +179,6 @@ class PnlDay(dPanel):
             day.FontBold = True
             day.ForeColor = "darkblue"
         self._hadFocus = True
-        day.FontItalic = (self.Form.ActiveControl == dummy)
         day.refresh()
 
     def lostFocus(self):
