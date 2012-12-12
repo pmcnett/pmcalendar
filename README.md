@@ -55,10 +55,10 @@ When a day number has the focus, type:
 * [: go to this day last month
 * ]: go to this day next month
 
-The arrow keys move you around in the currently displayed calendar, wrapping around the edges. Holding <ctrl> down while navigating with the arrow keys will do the following:
+The arrow keys move you around in the currently displayed calendar, wrapping around the edges. Holding &lt;ctrl&gt; down while navigating with the arrow keys will do the following:
 
-* <ctrl><up-or-down>: go to prior or next year, leaving cursor on the same calendar position.
-* <ctrl><left-or-right>: go to prior or next month, leaving cursor on the same calendar position.
+* &lt;ctrl&gt;&lt;up-or-down&gt;: go to prior or next year, leaving cursor on the same calendar position.
+* &lt;ctrl&gt;&lt;left-or-right&gt;: go to prior or next month, leaving cursor on the same calendar position.
 
 
 Use it in your application
