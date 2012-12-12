@@ -42,6 +42,7 @@ class PnlNavigation(dPanel):
     def setCaption(self, val):
         self.lblMonthYear.Caption = val
         self.layout()
+        callAfterInterval(100, self.Parent.Sizer.layout)
 
     def onHit_but(self, evt):
         pnlLayout = self.Form.pnlLayout
