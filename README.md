@@ -51,9 +51,10 @@ Put it in your PYTHONPATH. I have the pmcalendar package under /home/pmcnett/pmc
 
 Then use the create_tables.sql to add the required tables to your database, and add code to your application like:
 
-    from pmcalendar.ui import FrmCalendar
-    app = self.Application  ## (in a Dabo app where self is any dObject)
-    con = app.dbConnection  ## (whatever dConnection your app uses)
-    frmCalendar = FrmCalendar(self, Connection=con)
-    frmCalendar.show()
-
+```python
+from pmcalendar.ui import FrmCalendar
+app = self.Application  ## (in a Dabo app where self is any dObject)
+con = app.dbConnection  ## (whatever dConnection your app uses)
+frmCalendar = FrmCalendar(self, Connection=con)
+frmCalendar.show()
+```
