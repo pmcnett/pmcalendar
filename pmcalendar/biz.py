@@ -42,7 +42,7 @@ class BizDaily(BizBase):
 	def requery_for_dates(self, beg_date, end_date):
 		self.setWhereClause("date between ? and ?")
 		self.setParams((beg_date, end_date))
-		self.requery()
+		self.requery(convertQMarks=True)
 
 	def requery_for_date(self, date):
 		self.requery_for_dates(date, date)
