@@ -107,6 +107,7 @@ class DiaryView(dEditBox, EditMixin):
 	def onGotFocus(self, evt):
 		"""Switch to the edit control (with scrollbars)."""
 		edit = self.Parent.diaryedit
+		edit.Value = self.Value
 		edit.Visible = True
 		self.Visible = False
 		self.Parent.layout()
@@ -141,6 +142,7 @@ class DiaryEdit(dEditBox, EditMixin):
 		view.Value = self.Value
 		view.Visible = True
 		self.Visible = False
+		self.Value = ""
 		self.Parent.layout()
 
 
