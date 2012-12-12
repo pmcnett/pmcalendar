@@ -30,14 +30,14 @@ class PnlNavigation(dPanel):
                      "OnHit": self.onHit_but, "VisitedUnderline": False,
                      "LinkUnderline": False, "VisitedColor": "black",
                      "HoverUnderline": False, "LinkColor": "black"}
-        left_but = dHyperLink(self, Name="butLeft", Caption="<", **but_props)
-        right_but = dHyperLink(self, Name="butRight", Caption=">", **but_props)
+        left_but = dHyperLink(self, Name="butLeft", Caption="   <   ", **but_props)
+        right_but = dHyperLink(self, Name="butRight", Caption="   >   ", **but_props)
         lbl = dLabel(self, Name="lblMonthYear", FontBold=True)
         hs.appendSpacer(20)
         hs.append(left_but)
-        hs.appendSpacer(20)
+        hs.appendSpacer(10)
         hs.append(lbl, alignment="middle")
-        hs.appendSpacer(20)
+        hs.appendSpacer(10)
         hs.append(right_but)
         hs.appendSpacer(20)
         
