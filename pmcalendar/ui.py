@@ -4,7 +4,7 @@ import dabo
 dabo.ui.loadUI("wx")
 from dabo.ui import dForm, dPanel, dSizer, dGridSizer, dButton, dEditBox, \
                     dTextBox, dControlMixin, callAfterInterval, dKeys, \
-                    dLabel
+                    dLabel, dHyperLink
 from dabo.lib.dates import goMonth, goDate
 import biz
 
@@ -26,15 +26,17 @@ class BaseMixin(dControlMixin):
 class PnlNavigation(dPanel):
     def afterInit(self):
         hs = self.Sizer = dSizer("h")
-        but_props = {"FontBold": True, "BorderStyle": None,
-                     "OnHit": self.onHit_but}
-        left_but = dButton(self, Name="butLeft", Caption="<", **but_props)
-        right_but = dButton(self, Name="butRight", Caption=">", **but_props)
+        but_props = {"FontBold": True, "ShowInBrowser": False,
+                     "OnHit": self.onHit_but, "VisitedUnderline": False,
+                     "LinkUnderline": False, "VisitedColor": "black",
+                     "HoverUnderline": False, "LinkColor": "black"}
+        left_but = dHyperLink(self, Name="butLeft", Caption="<", **but_props)
+        right_but = dHyperLink(self, Name="butRight", Caption=">", **but_props)
         lbl = dLabel(self, Name="lblMonthYear", FontBold=True)
         hs.append(left_but)
-        hs.appendSpacer(2)
+        hs.appendSpacer(20)
         hs.append(lbl, alignment="middle")
-        hs.appendSpacer(2)
+        hs.appendSpacer(20)
         hs.append(right_but)
 
     def setCaption(self, val):
@@ -43,7 +45,7 @@ class PnlNavigation(dPanel):
 
     def onHit_but(self, evt):
         pnlLayout = self.Form.pnlLayout
-        interval = {"butLeft": -1, "butRight": 1}[evt.EventObject.Name]
+        interval = {"butLeft": -1, "butRight": 1,}[evt.EventObject.Name]
         new_date = goMonth(datetime.date(pnlLayout.Year, pnlLayout.Month, 1),
                            interval)
         pnlLayout.Year = new_date.year
@@ -408,7 +410,9 @@ class FrmCalendar(dForm):
             self._appendCaption = "Temporary Database"
         self._instantiatedLayouts = {}
         vs = self.Sizer = dSizer("v")
+        vs.appendSpacer(5)
         vs.append(PnlNavigation(self, Name="pnlNavigation"), alignment="center")
+        vs.appendSpacer(5)
         self.updateLayout()
             
     def updateLayout(self):
