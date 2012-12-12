@@ -1,7 +1,7 @@
 pmcalendar
 ==========
 
-Cross-platform desktop calendar applet that supports multiple database backends.
+Dabo-based cross-platform desktop calendar applet that supports multiple database backends.
 
 
 Features
