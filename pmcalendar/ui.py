@@ -23,6 +23,34 @@ class BaseMixin(dControlMixin):
         callAfterInterval(10, self.Parent.lostFocus)
 
 
+class PnlNavigation(dPanel):
+    def afterInit(self):
+        hs = self.Sizer = dSizer("h")
+        but_props = {"FontBold": True, "BorderStyle": None,
+                     "OnHit": self.onHit_but}
+        left_but = dButton(self, Name="butLeft", Caption="<", **but_props)
+        right_but = dButton(self, Name="butRight", Caption=">", **but_props)
+        lbl = dLabel(self, Name="lblMonthYear", FontBold=True)
+        hs.append(left_but)
+        hs.appendSpacer(2)
+        hs.append(lbl, alignment="middle")
+        hs.appendSpacer(2)
+        hs.append(right_but)
+
+    def setCaption(self, val):
+        self.lblMonthYear.Caption = val
+        self.layout()
+
+    def onHit_but(self, evt):
+        pnlLayout = self.Form.pnlLayout
+        interval = {"butLeft": -1, "butRight": 1}[evt.EventObject.Name]
+        new_date = goMonth(datetime.date(pnlLayout.Year, pnlLayout.Month, 1),
+                           interval)
+        pnlLayout.Year = new_date.year
+        pnlLayout.Month = new_date.month
+        pnlLayout.setFocus()
+
+
 class DummyTextBox(dTextBox, BaseMixin):
     """Invisible textbox simply to receive and respond to user actions."""
     def initProperties(self):
@@ -379,7 +407,8 @@ class FrmCalendar(dForm):
             con.executescript(open("./create_tables.sql").read())
             self._appendCaption = "Temporary Database"
         self._instantiatedLayouts = {}
-        self.Sizer = dSizer("v")
+        vs = self.Sizer = dSizer("v")
+        vs.append(PnlNavigation(self, Name="pnlNavigation"), alignment="center")
         self.updateLayout()
             
     def updateLayout(self):
@@ -389,7 +418,7 @@ class FrmCalendar(dForm):
         vs = self.Sizer
         for pnl in pnls.values():
             pnl.Visible = False
-        pnl = pnls.setdefault(PnlClass, PnlClass(self))
+        pnl = self.pnlLayout = pnls.setdefault(PnlClass, PnlClass(self))
         if pnl not in vs.ChildWindows:
             vs.append1x(pnl)
         self.layout()
@@ -399,6 +428,7 @@ class FrmCalendar(dForm):
         if appendCaption:
             appendCaption = "[%s]" % appendCaption
         self.Caption = "%s %s" % (val, appendCaption)
+        self.pnlNavigation.setCaption(val)
 
     def _getConnection(self):
         return getattr(self, "_connection", None)
