@@ -5,7 +5,7 @@ dabo.ui.loadUI("wx")
 from dabo.ui import dForm, dPanel, dSizer, dGridSizer, dButton, dEditBox, \
                     dTextBox, dControlMixin, callAfterInterval, dKeys, \
                     dLabel
-from dabo.lib.dates import goMonth
+from dabo.lib.dates import goMonth, goDate
 import biz
 
 __all__ = ["FrmCalendar"]
@@ -162,6 +162,15 @@ class PnlDay(dPanel):
         vs.append(hs, "expand")
         vs.append1x(DiaryView(self))
         vs.append1x(DiaryEdit(self))
+        parent = self.Parent
+        diary = self.diary
+        self.key_actions = {
+            (dKeys.key_Enter, dKeys.key_Numpad_enter): (diary.setFocus,),
+            (ord("t"), ord("T")): (parent.setFocusToToday, ()),
+            (ord("+"), ord("=")): (self.setFocusToInterval, ("days", 1)),
+            (ord("-"),): (self.setFocusToInterval, ("days", -1)),
+            (ord("["),): (self.setFocusToInterval, ("months", -1)),
+            (ord("]"),): (self.setFocusToInterval, ("months", 1))}
 
     def gotFocus(self):
         day = self.day
@@ -184,16 +193,25 @@ class PnlDay(dPanel):
     def setFocus(self):
         self.dummy.setFocus()
 
+    def setFocusToInterval(self, mode, interval):
+        """Go forward or backward by months or days."""
+        assert mode in ("days", "months")
+        func = {"days": goDate, "months": goMonth}[mode]
+        date = self.Date
+        self.Parent.setFocusToDate(func(date, interval))
+    
     def processDayKeyDown(self, evt):
         """User is navigating the calendar; respond appropriately."""
         evtData = evt.EventData
         kc = evtData["keyCode"]
         ctrlDown = evtData["controlDown"]
         layout = self.Form.CalendarLayout
-        if kc in [dKeys.key_Enter, dKeys.key_Numpad_enter]:
-            self.diary.setFocus()
-            evt.stop()
-            return
+        for keys, func_args in self.key_actions.items():
+            if kc in keys:
+                func, args = func_args
+                func(*args)
+                evt.stop()
+                return
         if kc not in [dKeys.key_Up, dKeys.key_Down,
                       dKeys.key_Left, dKeys.key_Right]:
             return
@@ -275,8 +293,7 @@ class PnlLayout(dPanel):
                 gs.append(PnlDay(self, Pos=(x,y)), "expand")
                 gs.setColExpand(True, x)
             gs.setRowExpand(True, y+1)
-        today = datetime.date.today()
-        self.setFocusToDate(today)
+        self.setFocusToToday()
 
     def afterDateChanged(self):
         self.setFormCaption()
@@ -310,14 +327,19 @@ class PnlLayout(dPanel):
                 self.date_obj_map[o.Date] = o
         self.update()
 
+    def setFocusToToday(self):
+        """Requerying the calendar if necessary, place cursor on today."""
+        self.setFocusToDate(datetime.date.today())
+
     def setFocusToDate(self, date):
+        """Requerying the calendar if necessary, place cursor on date."""
         try:
             self.date_obj_map[date].setFocus()
         except (KeyError, AttributeError):
             self.Year = date.year
             self.Month = date.month
             callAfterInterval(75, self.setFocusToDate, date)
-
+ 
     def _getMonth(self):
         return self._month
 
