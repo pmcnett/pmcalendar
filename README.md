@@ -33,8 +33,8 @@ Screenshots
 * <a href="https://raw.github.com/pmcnett/pmcalendar/master/screenshots/screenshot_linux.png">Linux</a>
 
 
-See it in action
-----------------
+Run the demo
+------------
 
 After installing and confirming the above prerequisites were installed:
 
@@ -42,6 +42,23 @@ After installing and confirming the above prerequisites were installed:
     python ui.py
 
 This will run it with an in-memory database automatically created for you.
+
+
+Keyboard Navigation
+-------------------
+
+When a day number has the focus, type:
+
+* t: go to today
+* -: go to yesterday
+* +: go to tomorrow
+* [: go to this day last month
+* ]: go to this day next month
+
+The arrow keys move you around in the currently displayed calendar, wrapping around the edges. Holding <ctrl> down while navigating with the arrow keys will do the following:
+
+* <ctrl><up-or-down>: go to prior or next year, leaving cursor on the same calendar position.
+* <ctrl><left-or-right>: go to prior or next month, leaving cursor on the same calendar position.
 
 
 Use it in your application
